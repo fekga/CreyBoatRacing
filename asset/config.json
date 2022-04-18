@@ -1,0 +1,29 @@
+{
+	"window" : 
+	{
+		"title" : "Boat Racing",
+		"width" : 800,
+		"height" : 600
+	},
+
+	"input" :
+	[
+		{ "tag" : "quit", "keycode" : 256 },
+		{ "tag" : "left", "keycode" : 65 },
+		{ "tag" : "right", "keycode" : 68 },
+		{ "tag" : "up", "keycode" : 87 },
+		{ "tag" : "down", "keycode" : 83 },
+		{ "tag" : "action", "keycode" : 32 }
+	],
+
+	"textures" :
+	[
+		{ "tag" : "hornet", "file" : "asset/textures/hornet.tga" },
+		{ "tag" : "layer01", "file" : "asset/textures/layer01.tga" },
+		{ "tag" : "layer02", "file" : "asset/textures/layer02.tga" },
+		{ "tag" : "layer03", "file" : "asset/textures/layer03.tga" },
+		{ "tag" : "layer04", "file" : "asset/textures/layer04.tga" },
+		{ "tag" : "layer05", "file" : "asset/textures/layer05.tga" },
+		{ "tag" : "boom", "file" : "asset/textures/boom.tga" }
+	]
+}
