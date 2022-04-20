@@ -26,6 +26,9 @@ const float ZOOM = 45.0f;
 class Camera
 {
 public:
+    const float NEAR_PLANE = 0.1f;
+    const float FAR_PLANE = 1000.0f;
+
     // camera Attributes
     glm::vec3 Position;
     glm::vec3 Front;
@@ -38,6 +41,7 @@ public:
     float Pitch;
     // camera options
     float Zoom;
+    float AspectRatio = 1.0f;
 
     // constructor with vectors
     Camera(
@@ -70,11 +74,18 @@ public:
         updateCameraVectors();
     }
 
-    // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    glm::mat4 GetViewMatrix(bool useTarget = false)
+    glm::mat4 GetProjectionMatrix() const
+    {
+        return glm::perspective(glm::radians(Zoom), AspectRatio, NEAR_PLANE, FAR_PLANE);
+    }
+
+    glm::mat4 GetViewMatrix(bool useTarget = false) const
     {
         if (useTarget)
-            return glm::lookAt(Position, Target, Up);
+        {
+            // translate everything in opposite direction by camera position
+            return glm::translate(glm::lookAt(Position, Target, WorldUp), -Position);
+        }
         return glm::lookAt(Position, Position + Front, Up);
     }
 

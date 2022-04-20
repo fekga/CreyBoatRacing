@@ -20,7 +20,7 @@ public:
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader() = default;
-    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
+    void load(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -103,9 +103,15 @@ public:
     }
     // activate the shader
     // ------------------------------------------------------------------------
-    void use()
+    void activate() const
     {
         glUseProgram(ID);
+    }
+    // deactivate the shader
+    // ------------------------------------------------------------------------
+    void deactivate() const
+    {
+        glUseProgram(0);
     }
     // utility uniform functions
     // ------------------------------------------------------------------------

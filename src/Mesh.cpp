@@ -10,7 +10,7 @@ void Mesh::generateTerrain(int dimensions)
 	size_t count = dimensions * dimensions;
 	float center = float(dimensions - 1) / 2.0f;
 	float* vertices = new float[count * 3];
-	float* normals = new float[count * 3];
+	//float* normals = new float[count * 3];
 	//float* textureCoords = new float[count * 2];
 	unsigned int* indices = new unsigned int[2 * 3 * (dimensions - 1) * (dimensions - 1)];
 	size_t vertexPointer = 0;
@@ -22,14 +22,12 @@ void Mesh::generateTerrain(int dimensions)
 			vertices[vertexPointer * 3 + 1] = 0.0f;
 			vertices[vertexPointer * 3 + 2] = (float)(i - center);
 
-			normals[vertexPointer * 3]		= 0.0f;
-			normals[vertexPointer * 3 + 1]	= 1.0f;
-			normals[vertexPointer * 3 + 2]	= 0.0f;
+			//normals[vertexPointer * 3]		= 0.0f;
+			//normals[vertexPointer * 3 + 1]	= 1.0f;
+			//normals[vertexPointer * 3 + 2]	= 0.0f;
 
 			//textureCoords[vertexPointer * 2] = (float)j / ((float)dimensions - 1);
 			//textureCoords[vertexPointer * 2 + 1] = (float)i / ((float)dimensions - 1);
-
-			//std::cout << vertices[vertexPointer*3] << ", " << vertices[vertexPointer*3 + 1] << ", " << vertices[vertexPointer*3 + 2] << "\n";
 
 			++vertexPointer;
 		}
@@ -51,107 +49,58 @@ void Mesh::generateTerrain(int dimensions)
 			
 		}
 	}
-	std::vector<float> vertexData(vertices, vertices + vertexPointer*3);
-	std::vector<float> normalData(normals, normals + vertexPointer*3);
+
+	// Important!
+	// Don't forget to multiply the vertexPointer by the components that element has (i.e. position = 3)
+	std::vector<float> vertexData(vertices, vertices + vertexPointer * 3);
+	//std::vector<float> normalData(normals, normals + vertexPointer * 3);
 	std::vector<unsigned int> indexData(indices, indices + pointer);
 	
-	loadToVAO(vertexData, normalData, noData, indexData);
+	loadToVAO(vertexData, noData, noData, indexData);
 
 	delete[] vertices;
-	delete[] normals;
+	//delete[] normals;
 	delete[] indices;
 }
 
 void Mesh::generateCube()
 {
 	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-	};
-
-	float texcoords[] = {
-		  0.0f, 0.0f,
-		  1.0f, 0.0f,
-		  1.0f, 1.0f,
-		  1.0f, 1.0f,
-		  0.0f, 1.0f,
-		  0.0f, 0.0f,
-		  0.0f, 0.0f,
-		  1.0f, 0.0f,
-		  1.0f, 1.0f,
-		  1.0f, 1.0f,
-		  0.0f, 1.0f,
-		  0.0f, 0.0f,
-		  1.0f, 0.0f,
-		  1.0f, 1.0f,
-		  0.0f, 1.0f,
-		  0.0f, 1.0f,
-		  0.0f, 0.0f,
-		  1.0f, 0.0f,
-		  1.0f, 0.0f,
-		  1.0f, 1.0f,
-		  0.0f, 1.0f,
-		  0.0f, 1.0f,
-		  0.0f, 0.0f,
-		  1.0f, 0.0f,
-		  0.0f, 1.0f,
-		  1.0f, 1.0f,
-		  1.0f, 0.0f,
-		  1.0f, 0.0f,
-		  0.0f, 0.0f,
-		  0.0f, 1.0f,
-		  0.0f, 1.0f,
-		  1.0f, 1.0f,
-		  1.0f, 0.0f,
-		  1.0f, 0.0f,
-		  0.0f, 0.0f,
-		  0.0f, 1.0f
+		-1, -1,  1, //0
+		 1, -1,  1, //1
+		-1,  1,  1, //2
+		 1,  1,  1, //3
+		-1, -1, -1, //4
+		 1, -1, -1, //5
+		-1,  1, -1, //6
+		 1,  1, -1  //7
 	};
 
 	unsigned int indices[] = {
-		0,1,2,2,3,0,
-
+		//Top
+		2, 6, 7,
+		2, 3, 7,
+		//Bottom
+		0, 4, 5,
+		0, 1, 5,
+		//Left
+		0, 2, 6,
+		0, 4, 6,
+		//Right
+		1, 3, 7,
+		1, 5, 7,
+		//Front
+		0, 2, 3,
+		0, 1, 3,
+		//Back
+		4, 6, 7,
+		4, 5, 7
 	};
 
 	std::vector<float> vertexData(std::begin(vertices),std::end(vertices));
-	std::vector<float> textureData(std::begin(texcoords), std::end(texcoords));
 	std::vector<unsigned int> indexData(std::begin(indices), std::end(indices));
 
-	loadToVAO(vertexData,noData,textureData,indexData);
+	loadToVAO(vertexData,noData,noData,indexData);
 }
 
 void Mesh::generatePlane()

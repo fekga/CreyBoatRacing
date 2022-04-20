@@ -2,72 +2,59 @@
 
 
 
+MyAmazingGame::~MyAmazingGame()
+{
+	if (SoundEngine)
+		SoundEngine->drop();
+}
+
 void MyAmazingGame::preInit( sf::Framework< MyAmazingGame >& iFramework )
 {
 	iFramework.getTextureManager().registerTextureLoader< sf::TGATextureLoader >( "tga" );
 
-	gameObject = new GameObject();
+	SoundEngine = irrklang::createIrrKlangDevice();
+	if (SoundEngine)
+	{
+		// Play music at some reasonable volume
+		SoundEngine->setSoundVolume(irrklang::ik_f32(0.1f));
+		Music = SoundEngine->play2D("asset/music/mixkit-crumpled-letters-1170.mp3", true, false, false, irrklang::ESM_AUTO_DETECT, true);
+		BoatEngineSoundSource = SoundEngine->addSoundSourceFromFile("asset/music/ES_Pontoon Boat Fast 13 - SFX Producer.wav", irrklang::ESM_AUTO_DETECT, true);
+		
+		if (BoatEngineSoundSource)
+		{
+			BoatEngineSound = SoundEngine->play2D(BoatEngineSoundSource, true, true, false, true);
+			// turn off volume initially
+			if (BoatEngineSound)
+				BoatEngineSound->setVolume(irrklang::ik_f32(0.0f));
+		}
+	}
 }
 
 void MyAmazingGame::postInit( sf::Framework< MyAmazingGame >& iFramework )
 {
-	ourShader_ = Shader("asset/shaders/water_simple.vs", "asset/shaders/water_simple.fs");
 
-	gameObject->setData();
-
-	ourShader_.use();
-}
-
-void MyAmazingGame::step( sf::Framework< MyAmazingGame >& iFramework, double deltaTime)
-{
+	// Set up camera values
 	const glm::vec2 windowSize = glm::vec2(iFramework.getWindow().getWindowWidth(), iFramework.getWindow().getWindowHeight());
 	const glm::float32 aspectRatio = windowSize.x / windowSize.y;
 
+	camera_.AspectRatio = aspectRatio;
+
+
+	// Initialize objects' data
+	for (GameObject* obj : GameObject::Objects)
+	{
+		obj->initDone();
+	}
+}
+
+void MyAmazingGame::step(sf::Framework< MyAmazingGame >& iFramework, double deltaTime)
+{
 	processInput(iFramework, deltaTime);
-
-	glClearColor(color.r, color.g, color.b, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-
-	// wireframe mode
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	// enable gamma correction
-	glEnable(GL_FRAMEBUFFER_SRGB);
-
-	// activate shader
-	ourShader_.use();
-
-
-	// pass projection matrix to shader (note that in this case it could change every frame)
-	glm::mat4 projection = glm::perspective(glm::radians(camera_.Zoom), aspectRatio, NEAR_PLANE, FAR_PLANE);
-	ourShader_.setMat4("projection", projection);
-
-
-	// camera/view transformation
-	glm::mat4 view = glm::mat4(1.0f);
-	view = camera_.GetViewMatrix(true);
-	ourShader_.setMat4("view", view);
-
-
-	// calculate the model matrix for each object and pass it to shader before drawing
-	 // make sure to initialize matrix to identity matrix first
-	glm::mat4 model = gameObject->getModelMatrix();
-	ourShader_.setMat4("model", model);
-
-	ourShader_.setVec3("viewPos", camera_.Position);
-
-	ourShader_.setFloat("time", (float)timeElapsed);
-
-	gameObject->render();
-
-	glDisable(GL_DEPTH_TEST);
+	update(deltaTime);
+	render();
 
 	timeElapsed += deltaTime;
-	//std::cout << "Time elapsed: " << timeElapsed << "\n";
-	GLenum error = glGetError();
-	if (error) std::cout << error << "\n";
+	GameObject::ElapsedTime = timeElapsed;
 }
 
 void MyAmazingGame::processInput(sf::Framework< MyAmazingGame >& iFramework, double deltaTime)
@@ -94,19 +81,81 @@ void MyAmazingGame::processInput(sf::Framework< MyAmazingGame >& iFramework, dou
 	{
 		movement.x -= 1.0f;
 	}
+
+	bool engineRunning = false;
 	if (glm::length(movement) > 0.0f)
+	{
 		movement = glm::normalize(movement);
+		if(movement.z != 0.0f)
+			engineRunning = true;
+	}
 
-	gameObject->setMovement(movement);
-	gameObject->update((float)deltaTime);
-	static bool b = false;
-	if(!b)
-	gameObject->updateCamera(camera_,(float)deltaTime);
-	b = true;
+	if (engineRunning)
+	{
+		// Start engine
+		if (SoundEngine && BoatEngineSound)
+		{
+			irrklang::ik_f32 volume = BoatEngineSound->getVolume();
+			if(volume == 0.0f)
+				BoatEngineSound->setIsPaused(false);
+			volume += 0.5f * deltaTime;
+			volume *= 1.2f;
+			volume = min(volume, 0.35f);
+			BoatEngineSound->setVolume(volume);
+		}
+	}
+	else
+	{
+		// Stop engine
+		if (SoundEngine && BoatEngineSound)
+		{
+			irrklang::ik_f32 volume = BoatEngineSound->getVolume();
+			
+			volume -= 1.f * deltaTime;
+			volume = max(volume, 0.0f);
+			BoatEngineSound->setVolume(volume);
+			if (volume == 0.0f)
+				BoatEngineSound->setIsPaused(true);
+		}
+	}
 
+	boat_.setMovement(movement);
 
+	// Quit when user presses escape
+	// might need to change value in config
 	if (iFramework.getInputManager().isRepeat("quit"))
 	{
 		iFramework.shouldClose();
 	}
+}
+
+void MyAmazingGame::update(double deltaTime)
+{
+	for (GameObject* obj : GameObject::Objects)
+	{
+		obj->update((float)deltaTime);
+		obj->updateCamera(camera_, (float)deltaTime);
+	}
+}
+
+void MyAmazingGame::render()
+{
+	glClearColor(color.r, color.g, color.b, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+
+	// wireframe mode
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	// enable gamma correction
+	glEnable(GL_FRAMEBUFFER_SRGB);
+
+	water_.render(camera_, (float)timeElapsed);
+	boat_.render(camera_, (float)timeElapsed);
+
+	glDisable(GL_DEPTH_TEST);
+
+	GLenum error = glGetError();
+	if (error) std::cout << error << "\n";
 }
