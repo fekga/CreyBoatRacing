@@ -1,13 +1,8 @@
 #version 330 core
 layout (location = 0) in vec3 position;
-/* layout (location = 1) in vec3 normal;
-layout (location = 2) in vec2 texCoord; */
 
-
-/* out vec2 v_texCoord; */
-out vec3 v_normal;
-out vec3 v_fragPos;
-out vec3 v_viewPos;
+out vec3 Normal;
+out vec3 FragPos;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -18,7 +13,6 @@ uniform vec3 viewPos;
 uniform float time;
 
 const float pi = acos(-1.0);
-
 
 uniform vec4 WaveA = vec4(1,1,0.25,20);
 uniform vec4 WaveB = vec4(1,.6,.25,11);
@@ -69,12 +63,9 @@ void main()
     
     vec3 normal = normalize(cross(binormal,tangent));
     
-    gl_Position = projection * view * model * vec4(p,1);
-    v_fragPos = (model * vec4(p,1)).xyz;
-    /* v_texCoord = texCoord; */
-
+    FragPos = (model * vec4(p,1)).xyz;
+    gl_Position = projection * view * vec4(FragPos,1);
     
-    v_normal = normal.xyz;
 
-    v_viewPos = viewPos;
+    Normal = normal;
 }

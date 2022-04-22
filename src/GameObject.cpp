@@ -1,9 +1,11 @@
 #include "GameObject.h"
 
-std::list<GameObject*> GameObject::Objects;
+std::vector<GameObject*> GameObject::Objects;
 float GameObject::ElapsedTime = 0.0f;
+glm::vec3 GameObject::SunPosition;
+std::vector<glm::vec4> GameObject::Waves;
 
-glm::vec3 GerstnerWave(glm::vec4 wave, glm::vec3 p, glm::vec3& tangent, glm::vec3& binormal, float time)
+glm::vec3 GerstnerWave(const glm::vec4& wave, const glm::vec3& p, glm::vec3& tangent, glm::vec3& binormal, const float& time)
 {
 	float steepness = wave.z;
 	float wavelength = wave.w;
@@ -38,18 +40,14 @@ glm::vec3 GerstnerWave(glm::vec4 wave, glm::vec3 p, glm::vec3& tangent, glm::vec
 	) * f_helper_return * a;
 }
 
-glm::vec3 GerstnerWaves(glm::vec3 pos, glm::vec3& normal, float time)
+glm::vec3 GerstnerWaves(const std::vector<glm::vec4>& waves, const glm::vec3& pos, glm::vec3& normal, const float& time)
 {
-	const glm::vec4 WaveA = glm::vec4(1, 1, 0.25, 20);
-	const glm::vec4 WaveB = glm::vec4(1, .6, .25, 11);
-	const glm::vec4 WaveC = glm::vec4(1, 1.3, .25, 8);
 	glm::vec3 tangent = glm::vec3(1, 0, 0);
 	glm::vec3 binormal = glm::vec3(0, 0, 1);
 	glm::vec3 p = pos;
-	p += GerstnerWave(WaveA, pos, tangent, binormal, time);
-	p += GerstnerWave(WaveB, pos, tangent, binormal, time);
-	p += GerstnerWave(WaveC, pos, tangent, binormal, time);
+	for(auto &wave : waves)
+		p += GerstnerWave(wave, pos, tangent, binormal, time);
 
 	normal = glm::normalize(glm::cross(binormal, tangent));
-	return p;
+	return p-pos;
 }

@@ -4,23 +4,23 @@
 class Water :
     public GameObject
 {
-public:
-	bool initDone()
+	void v_init()
 	{
-		bool initCalled = GameObject::initDone();
-		if (!initCalled)
+		if (!shader_.ID)
 		{
 			shader_.load("asset/shaders/water.vs", "asset/shaders/water.fs");
 			mesh_.generateTerrain(2000);
 		}
-		return initCalled;
 	}
-
+public:
     void render(const Camera& camera, float timeElapsed)
     {
 		preRender(shader_, camera);
 
-		//TODO don't forget to turn movement on
+		shader_.setVec4("WaveA", GameObject::Waves[0]);
+		shader_.setVec4("WaveB", GameObject::Waves[1]);
+		shader_.setVec4("WaveC", GameObject::Waves[2]);
+
 		shader_.setFloat("time", timeElapsed);
 
 		mesh_.render();
@@ -29,8 +29,6 @@ public:
     }
 
 private:
-	
-
     static Shader shader_;
 	static Mesh mesh_;
 };

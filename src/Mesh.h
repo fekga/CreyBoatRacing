@@ -5,6 +5,10 @@
 
 #include <vector>
 
+#include <filesystem>
+#include <fstream>
+#include <string>
+
 
 class Mesh
 {
@@ -33,6 +37,8 @@ public:
 		glDrawElements(GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
+
+	static void loadOBJ(const std::filesystem::path& path);
 
 	GLuint VAO_ = 0;
 	GLsizei indexCount_ = 0;

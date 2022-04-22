@@ -62,12 +62,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libs\irrKlang-64bit-1.6.0\include;$(SolutionDir)\libs\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libs\stb;$(SolutionDir)\libs\irrKlang-64bit-1.6.0\include;$(SolutionDir)\libs\assimp_x64-windows\include;$(SolutionDir)\libs\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\dev\crey_boatracing\CreySimpleFramework\libs\irrKlang-64bit-1.6.0\lib\Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\libs\assimp_x64-windows\lib;$(SolutionDir)\libs\irrKlang-64bit-1.6.0\lib\Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -92,6 +93,9 @@
     <ClCompile Include="libs\glad\src\glad.c" />
     <ClCompile Include="src\Boat.cpp" />
     <ClCompile Include="src\Buoy.cpp" />
+    <ClCompile Include="src\Coin.cpp" />
+    <ClCompile Include="src\EntityMesh.cpp" />
+    <ClCompile Include="src\EntityModel.cpp" />
     <ClCompile Include="src\Framework.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -133,6 +137,9 @@
     <ClInclude Include="src\Boat.h" />
     <ClInclude Include="src\Buoy.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Coin.h" />
+    <ClInclude Include="src\EntityMesh.h" />
+    <ClInclude Include="src\EntityModel.h" />
     <ClInclude Include="src\Framework.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\InputManager.h" />

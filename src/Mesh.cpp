@@ -3,6 +3,10 @@
 #include <iostream>
 #include <iterator>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 const std::vector<float> Mesh::noData;
 
 void Mesh::generateTerrain(int dimensions)
@@ -168,4 +172,25 @@ void Mesh::bindIndicesBuffer(const std::vector<unsigned int>& indices)
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data_length, &indices[0], GL_STATIC_DRAW);
+}
+
+void Mesh::loadOBJ(const std::filesystem::path& path)
+{
+	std::filesystem::path filePath = path;
+	std::cout << filePath;
+
+	std::ifstream file = std::ifstream(filePath.string());
+	std::string line;
+	
+	while (std::getline(file, line))
+	{
+		std::cout << line << std::endl;
+	}
+
+	std::vector<float> vertexData;
+	std::vector<float> textureData;
+	std::vector<float> normalData;
+	std::vector<unsigned int> indexData;
+
+
 }

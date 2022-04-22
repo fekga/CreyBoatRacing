@@ -8,6 +8,9 @@
 
 #include "rapidjson/document.h"
 
+
+//#include <stb_image.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
@@ -28,6 +31,8 @@
 #include "Framework.cpp"
 
 #include "MyAmazingGame.cpp"
+
+
 
 int main( void )
 {

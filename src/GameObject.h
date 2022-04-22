@@ -2,38 +2,49 @@
 
 #include "Mesh.h"
 
+#include "EntityModel.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/io.hpp>
 
 #include <iostream>
-
-#include <list>
+#include <vector>
 
 #include "Camera.h"
 #include "Shader.h"
 
-glm::vec3 GerstnerWave(glm::vec4 wave, glm::vec3 p, glm::vec3& tangent, glm::vec3& binormal, float time);
+glm::vec3 GerstnerWave(const glm::vec4& wave, const glm::vec3& p, glm::vec3& tangent, glm::vec3& binormal, const float& time);
 
-glm::vec3 GerstnerWaves(glm::vec3 pos, glm::vec3& normal, float time);
-	
-
+glm::vec3 GerstnerWaves(const std::vector<glm::vec4>& waves, const glm::vec3& pos, glm::vec3& normal, const float& time);
 
 class GameObject
 {
 public:
 
-	static std::list<GameObject*> Objects;
+	static std::vector<GameObject*> Objects;
 	static float ElapsedTime;
+	static glm::vec3 SunPosition;
+	static std::vector<glm::vec4> Waves;
 
+	bool is_dead = false;
 	GameObject()
 	{
-		Objects.push_back(this);
+		
 	}
-
 	virtual ~GameObject()
 	{
-		Objects.remove(this);
+		is_dead = true;
 	}
+public:
+	template<typename T>
+	static T* create()
+	{
+		T* t = new T();
+		Objects.push_back(t);
+		return t;
+	}
+
 	// no copy operations
 	GameObject(const GameObject&) = delete;
 	GameObject& operator=(const GameObject&) = delete;
@@ -56,18 +67,24 @@ public:
 		return model;
 	}
 
-	virtual bool initDone()
+	void init()
 	{
-		// First call return false, subsequent calls return true
-		// Call this in inherited children
-		static bool initCalled = false;
-		if (!initCalled)
-			return false;
-		initCalled = true;
-		return true;
+		if (!init_flag)
+		{
+			v_init();
+			init_flag = true;
+		}
 	}
 
-	
+	glm::vec3 getPosition() const
+	{
+		return position_;
+	}
+
+	void setPosition(const glm::vec3& newPos)
+	{
+		position_ = newPos;
+	}
 
 protected:
 	virtual void preRender(const Shader& shader, const Camera& camera)
@@ -86,9 +103,16 @@ protected:
 		shader.setMat4("model", model);
 
 		shader.setVec3("viewPos", camera.Position);
+
+		shader.setVec3("sunPosition", SunPosition);
 	}
 
 	glm::vec3 position_ = glm::vec3(0.0f);
 	glm::vec3 scale_ = glm::vec3(1.0f);
+
+
+	virtual void v_init() = 0;
+private:
+	bool init_flag = false;
 };
 
